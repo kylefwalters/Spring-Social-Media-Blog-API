@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public Account findByAccountId(Integer accountId) {
+        Optional<Account> foundAccount = accountRepository.findById(accountId);
+        return foundAccount.orElse(null);
+    }
+
     public Account findByUsername(String username) {
         List<Account> foundUsers = accountRepository.findByUsername(username);
         if(foundUsers.isEmpty()) {
@@ -28,11 +34,11 @@ public class AccountService {
 
     public Account findByUsernameAndPassword(String username, String password) {
         Account foundAccount = findByUsername(username);
-        if(foundAccount == null) {
+        if(foundAccount == null || !password.equals(foundAccount.getPassword())) {
             return null;
         }
-
-        return foundAccount.getPassword() == password ? foundAccount : null;
+        
+        return foundAccount;
     }
 
     public Account registerAccount(Account account) {
